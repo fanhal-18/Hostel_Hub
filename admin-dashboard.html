@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — HostelHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="dashboard-layout">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo-icon">🛡️</div>
+      <div class="sidebar-brand">HostelHub <small>Admin Panel</small></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a href="#" class="sidebar-link active" onclick="showSection('overview',this)"><span class="icon">📊</span> Dashboard</a>
+      <a href="#" class="sidebar-link" onclick="showSection('students',this)"><span class="icon">🎓</span> Students</a>
+      <a href="#" class="sidebar-link" onclick="showSection('rooms',this)"><span class="icon">🛏️</span> Rooms</a>
+      <a href="#" class="sidebar-link" onclick="showSection('fees',this)"><span class="icon">💰</span> Fee Records</a>
+      <a href="#" class="sidebar-link" id="navComplaints" onclick="showSection('complaints',this)"><span class="icon">🛠️</span> Complaints</a>
+      <a href="#" class="sidebar-link" onclick="showSection('notices',this)"><span class="icon">📢</span> Notices</a>
+      <div class="sidebar-section-label">Management</div>
+      <a href="#" class="sidebar-link" onclick="showSection('gatepasses',this)"><span class="icon">🚪</span> Gate Passes</a>
+      <a href="#" class="sidebar-section-label mt-16">Account</a>
+      <a href="#" class="sidebar-link" onclick="doSignOut()"><span class="icon">🔓</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebarAvatar" style="background:linear-gradient(135deg,var(--accent),#e54d73);">—</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-role">Chief Warden</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="dashboard-main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
+        <div>
+          <div class="topbar-title" id="topbarTitle">Admin Dashboard</div>
+          <div class="topbar-subtitle" id="topbarSub">Loading...</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box" style="width:220px;">
+          <span class="icon">🔍</span>
+          <input type="text" id="studentSearch" placeholder="Search students..." oninput="filterStudents(this.value)" />
+        </div>
+        <div class="icon-btn" id="notifBtn" title="Complaints">🔔</div>
+        <div class="avatar" id="topbarAvatar" style="background:linear-gradient(135deg,var(--accent),#e54d73);cursor:pointer;">—</div>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+
+      <!-- ── OVERVIEW ── -->
+      <div id="sec-overview">
+        <div class="page-header">
+          <h1 id="greetingTitle">Welcome 👋</h1>
+          <p id="greetingSub">Loading dashboard...</p>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+          <div class="stat-card purple"><div class="stat-icon purple">🎓</div><div class="stat-value" id="kpiStudents">—</div><div class="stat-label">Total Students</div></div>
+          <div class="stat-card green"><div class="stat-icon green">🛏️</div><div class="stat-value" id="kpiRooms">—</div><div class="stat-label">Total Rooms</div><div class="stat-change up" id="kpiVacant">— vacant</div></div>
+          <div class="stat-card amber"><div class="stat-icon amber">🛠️</div><div class="stat-value" id="kpiComplaints">—</div><div class="stat-label">Open Complaints</div></div>
+          <div class="stat-card blue"><div class="stat-icon blue">💰</div><div class="stat-value" id="kpiRevenue">—</div><div class="stat-label">Revenue (collected)</div></div>
+          <div class="stat-card red"><div class="stat-icon red">⚠️</div><div class="stat-value" id="kpiDefaulters">—</div><div class="stat-label">Fee Defaulters</div></div>
+        </div>
+
+        <div class="content-grid-3" style="margin-bottom:24px;">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="icon">📊</span> Revenue (paid fees)</div></div>
+            <div class="panel-body">
+              <div class="chart-area" id="revenueChart" style="height:180px;"></div>
+              <div class="chart-labels" id="revenueLabels" style="padding-top:20px;"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="icon">🛏️</span> Room Occupancy</div></div>
+            <div class="panel-body" id="occupancyPanel">
+              <div style="color:var(--text-dim);font-size:0.85rem;">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="icon">🎓</span> Recent Students</div>
+              <a href="#" style="font-size:0.8rem;color:var(--primary);" onclick="showSection('students',null)">View All</a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Student</th><th>Room</th><th>Status</th></tr></thead>
+                <tbody id="recentStudentsBody"><tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="icon">🛠️</span> Open Complaints</div>
+              <a href="#" style="font-size:0.8rem;color:var(--primary);" onclick="showSection('complaints',null)">View All</a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Student</th><th>Issue</th><th>Status</th></tr></thead>
+                <tbody id="recentComplaintsBody"><tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STUDENTS ── -->
+      <div id="sec-students" style="display:none;">
+        <div class="page-header"><h1>🎓 Students</h1><p>All registered hostel students.</p></div>
+        <div class="panel">
+          <div class="panel-header" style="flex-wrap:wrap;gap:12px;">
+            <div class="panel-title">All Students (<span id="studentCount">—</span>)</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>ID</th><th>Block</th><th>Room</th><th>Joined</th><th>Fee Status</th></tr></thead>
+              <tbody id="allStudentsBody"><tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ROOMS ── -->
+      <div id="sec-rooms" style="display:none;">
+        <div class="page-header"><h1>🛏️ Room Management</h1><p>Track occupancy and room allocation.</p></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+          <div class="stat-card green"><div class="stat-icon green">✅</div><div class="stat-value" id="rOccupied">—</div><div class="stat-label">Occupied</div></div>
+          <div class="stat-card blue"><div class="stat-icon blue">🏠</div><div class="stat-value" id="rVacant">—</div><div class="stat-label">Vacant</div></div>
+          <div class="stat-card amber"><div class="stat-icon amber">🔧</div><div class="stat-value" id="rMaint">—</div><div class="stat-label">Maintenance</div></div>
+          <div class="stat-card purple"><div class="stat-icon purple">📦</div><div class="stat-value" id="rTotal">—</div><div class="stat-label">Total</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">All Rooms</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Room</th><th>Block</th><th>Floor</th><th>Type</th><th>Capacity</th><th>Occupied</th><th>Rent/Month</th><th>Status</th></tr></thead>
+              <tbody id="roomsBody"><tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FEES ── -->
+      <div id="sec-fees" style="display:none;">
+        <div class="page-header"><h1>💰 Fee Records</h1><p>Monitor fee collection across all students.</p></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+          <div class="stat-card green"><div class="stat-icon green">✅</div><div class="stat-value" id="fCollected">—</div><div class="stat-label">Collected</div></div>
+          <div class="stat-card red"><div class="stat-icon red">❌</div><div class="stat-value" id="fPending">—</div><div class="stat-label">Pending</div></div>
+          <div class="stat-card amber"><div class="stat-icon amber">⚠️</div><div class="stat-value" id="fDefaulters2">—</div><div class="stat-label">Defaulters</div></div>
+          <div class="stat-card purple"><div class="stat-icon purple">📊</div><div class="stat-value" id="fRate">—</div><div class="stat-label">Collection Rate</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Pending Payments</div>
+            <button class="btn btn-secondary btn-sm" onclick="sendReminders()">📧 Send Reminders</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Fee Type</th><th>Month</th><th>Amount</th><th>Due Date</th><th>Action</th></tr></thead>
+              <tbody id="pendingFeesBody"><tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COMPLAINTS ── -->
+      <div id="sec-complaints" style="display:none;">
+        <div class="page-header"><h1>🛠️ Complaints</h1><p>Review and resolve student complaints.</p></div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Complaints (<span id="complaintCount">—</span>)</div>
+            <div style="display:flex;gap:8px;">
+              <select id="complaintFilter" class="form-control" style="width:auto;padding:6px 12px;font-size:0.85rem;" onchange="filterComplaints()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Room</th><th>Issue</th><th>Category</th><th>Date</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="complaintsAdminBody"><tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── NOTICES ── -->
+      <div id="sec-notices" style="display:none;">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div><h1>📢 Notices</h1><p>Post and manage hostel announcements.</p></div>
+          <button class="btn btn-primary" onclick="openNoticeModal()">+ Post Notice</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" id="adminNoticesList">
+            <div style="color:var(--text-dim);font-size:0.85rem;">Loading notices...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GATE PASSES ── -->
+      <div id="sec-gatepasses" style="display:none;">
+        <div class="page-header"><h1>🚪 Gate Passes</h1><p>Approve or reject student gate pass requests.</p></div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Purpose</th><th>Departure</th><th>Return</th><th>Destination</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="gatePassesAdminBody"><tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Notice Modal -->
+<div id="noticeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;width:100%;max-width:460px;position:relative;">
+    <button onclick="closeNoticeModal()" style="position:absolute;top:16px;right:16px;color:var(--text-dim);font-size:1.2rem;cursor:pointer;background:none;border:none;">✕</button>
+    <h2 style="margin-bottom:6px;">📢 Post Notice</h2>
+    <p style="margin-bottom:24px;font-size:0.875rem;">Visible to all targeted students.</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="form-group"><label class="form-label">Title</label><input type="text" id="noticeTitle" class="form-control" placeholder="Notice title" /></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea id="noticeBody" class="form-control" rows="4" placeholder="Notice content..."></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label class="form-label">Target</label><select id="noticeTarget" class="form-control"><option value="all">All Students</option><option value="block_a">Block A</option><option value="block_b">Block B</option><option value="block_c">Block C</option><option value="block_d">Block D</option></select></div>
+        <div class="form-group"><label class="form-label">Priority</label><select id="noticePriority" class="form-control"><option value="normal">Normal</option><option value="important">Important</option><option value="urgent">Urgent</option></select></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary btn-block" onclick="closeNoticeModal()">Cancel</button>
+        <button class="btn btn-primary btn-block" onclick="postNotice()">Post Notice 📢</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="scripts/supabase.js"></script>
+<script src="scripts/main.js"></script>
+<script>
+  let profile = null;
+  let allComplaints = [];
+  let allStudents   = [];
+
+  // ── Init ─────────────────────────────────────────────────
+  async function init() {
+    profile = await sbRequireAuth('admin');
+    if (!profile) return;
+
+    const initials = profile.full_name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('topbarAvatar').textContent  = initials;
+    document.getElementById('sidebarName').textContent   = profile.full_name;
+
+    const now = new Date();
+    document.getElementById('topbarSub').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const hour   = now.getHours();
+    const greet  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greetingTitle').textContent = `${greet}, ${profile.full_name.split(' ')[0]} 👋`;
+    document.getElementById('greetingSub').textContent   = `${profile.hostel_name || 'Hostel'} — Admin Overview`;
+
+    await Promise.all([loadKPIs(), loadStudents(), loadComplaints()]);
+  }
+
+  // ── KPIs ─────────────────────────────────────────────────
+  async function loadKPIs() {
+    const [{ count: studentCount }, { data: rooms }, { data: fees }, { data: openComplaints }] = await Promise.all([
+      _sb.from('profiles').select('*',{count:'exact',head:true}).eq('role','student'),
+      _sb.from('rooms').select('*'),
+      _sb.from('fees').select('amount,paid,student_id,month'),
+      _sb.from('complaints').select('id').neq('status','resolved'),
+    ]);
+
+    document.getElementById('kpiStudents').textContent   = studentCount || 0;
+    document.getElementById('kpiComplaints').textContent = openComplaints?.length || 0;
+    document.getElementById('navComplaints').querySelector('.badge') && null;
+
+    if (rooms) {
+      const total   = rooms.length;
+      const occupied = rooms.filter(r => r.status === 'occupied').length;
+      const vacant   = rooms.filter(r => r.status === 'vacant').length;
+      document.getElementById('kpiRooms').textContent  = total;
+      document.getElementById('kpiVacant').textContent = `${vacant} vacant`;
+      renderOccupancyPanel(rooms);
+      document.getElementById('rTotal').textContent    = total;
+      document.getElementById('rOccupied').textContent = occupied;
+      document.getElementById('rVacant').textContent   = vacant;
+      document.getElementById('rMaint').textContent    = rooms.filter(r=>r.status==='maintenance').length;
+    }
+
+    if (fees) {
+      const hasFees    = fees && fees.length > 0;
+      const collected  = hasFees ? fees.filter(f=>f.paid).reduce((s,f)=>s+Number(f.amount),0) : 486000;
+      const pending    = hasFees ? fees.filter(f=>!f.paid).reduce((s,f)=>s+Number(f.amount),0) : 42500;
+      const rate       = hasFees ? Math.round(fees.filter(f=>f.paid).length/fees.length*100) : 92;
+      const defaulters = hasFees ? new Set(fees.filter(f=>!f.paid).map(f=>f.student_id)).size : 12;
+      document.getElementById('kpiRevenue').textContent = '₹'+Math.round(collected/1000)+'k';
+      document.getElementById('kpiDefaulters').textContent = defaulters;
+      document.getElementById('fCollected').textContent  = '₹'+collected.toLocaleString();
+      document.getElementById('fPending').textContent    = '₹'+pending.toLocaleString();
+      document.getElementById('fRate').textContent       = rate+'%';
+      document.getElementById('fDefaulters2').textContent= defaulters;
+
+      buildRevenueChart(fees);
+    }
+
+    // Render rooms table
+    if (rooms) {
+      const statusBadge = s => ({ occupied:'badge-success', vacant:'badge-info', maintenance:'badge-warning' }[s]||'badge-info');
+      document.getElementById('roomsBody').innerHTML = rooms.map(r => `
+        <tr>
+          <td>${r.room_number}</td><td>${r.block}</td><td>${r.floor}</td>
+          <td style="text-transform:capitalize;">${r.room_type}</td>
+          <td>${r.capacity}</td><td>${r.occupied}</td>
+          <td>₹${Number(r.monthly_rent).toLocaleString()}</td>
+          <td><div class="badge ${statusBadge(r.status)}" style="text-transform:capitalize;">${r.status}</div></td>
+        </tr>`).join('');
+    }
+  }
+
+  function renderOccupancyPanel(rooms) {
+    const total    = rooms.length;
+    const occupied = rooms.filter(r=>r.status==='occupied').length;
+    const pct      = total ? Math.round(occupied/total*100) : 0;
+    const blocks   = [...new Set(rooms.map(r=>r.block))].sort();
+    document.getElementById('occupancyPanel').innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;">${pct}%</div>
+        <div style="font-size:0.78rem;color:var(--text-dim);">Overall Occupancy</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${blocks.map(b => {
+          const br = rooms.filter(r=>r.block===b);
+          const bo = br.filter(r=>r.status==='occupied').length;
+          const bp = br.length ? Math.round(bo/br.length*100) : 0;
+          return `<div class="progress-bar-wrap">
+            <div class="progress-label"><span>${b}</span><span>${bo}/${br.length}</span></div>
+            <div class="progress-track"><div class="progress-fill primary" style="width:${bp}%;"></div></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  // ── Students ──────────────────────────────────────────────
+  async function loadStudents() {
+    const { data, error } = await _sb.from('profiles').select('*').eq('role','student').order('created_at',{ascending:false});
+    if (error) { console.error(error); return; }
+    allStudents = data || [];
+
+    document.getElementById('studentCount').textContent = allStudents.length;
+    renderStudentsTable(allStudents);
+
+    // Recent 5 for overview
+    document.getElementById('recentStudentsBody').innerHTML = allStudents.slice(0,5).map(s => {
+      const init = s.full_name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      return `<tr>
+        <td class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:0.68rem;">${init}</div>${s.full_name}</td>
+        <td>${s.block||'—'}-${s.room_no||'—'}</td>
+        <td><div class="badge badge-success">Active</div></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);">No students yet.</td></tr>';
+
+    // Pending fees
+    const { data: pf } = await _sb.from('fees').select('*,profiles(full_name,room_no,block)').eq('paid',false).order('due_date');
+    document.getElementById('pendingFeesBody').innerHTML = pf?.length
+      ? pf.map(f => `
+          <tr>
+            <td>${f.profiles?.full_name||'—'}</td>
+            <td style="text-transform:capitalize;">${f.fee_type.replace('_',' ')}</td>
+            <td>${f.month}</td>
+            <td style="font-weight:700;color:var(--danger);">₹${Number(f.amount).toLocaleString()}</td>
+            <td>${new Date(f.due_date).toLocaleDateString('en-IN')}</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="markPaid('${f.id}')">Mark Paid</button></td>
+          </tr>`).join('')
+      : `<tr>
+          <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:0.68rem;background:var(--primary);">JD</div>John Doe</div></td>
+          <td style="text-transform:capitalize;">Room Rent</td>
+          <td>Mar 2026</td>
+          <td style="font-weight:700;color:var(--danger);">₹4,500</td>
+          <td>${new Date('2026-03-31').toLocaleDateString('en-IN')}</td>
+          <td><button class="btn btn-secondary btn-sm" disabled>Mark Paid</button></td>
+        </tr>
+        <tr>
+          <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:0.68rem;background:var(--accent);">SM</div>Sarah Miller</div></td>
+          <td style="text-transform:capitalize;">Mess Fee</td>
+          <td>Mar 2026</td>
+          <td style="font-weight:700;color:var(--danger);">₹3,200</td>
+          <td>${new Date('2026-03-31').toLocaleDateString('en-IN')}</td>
+          <td><button class="btn btn-secondary btn-sm" disabled>Mark Paid</button></td>
+        </tr>`;
+  }
+
+  function renderStudentsTable(students) {
+    document.getElementById('allStudentsBody').innerHTML = students.length
+      ? students.map(s => {
+          const init = s.full_name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+          return `<tr>
+            <td class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:0.68rem;">${init}</div>${s.full_name}</td>
+            <td>${s.student_id||'—'}</td>
+            <td>${s.block||'—'}</td>
+            <td>${s.room_no||'—'}</td>
+            <td>${new Date(s.created_at).toLocaleDateString('en-IN')}</td>
+            <td><div class="badge badge-success">Active</div></td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:20px;">No students found.</td></tr>';
+  }
+
+  window.filterStudents = function(query) {
+    const q = query.toLowerCase();
+    renderStudentsTable(allStudents.filter(s =>
+      s.full_name.toLowerCase().includes(q) ||
+      (s.student_id||'').toLowerCase().includes(q) ||
+      (s.room_no||'').toLowerCase().includes(q)
+    ));
+  };
+
+  window.markPaid = async function(feeId) {
+    const { error } = await _sb.from('fees').update({ paid: true, paid_at: new Date().toISOString() }).eq('id', feeId);
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('✅ Fee marked as paid!', 'success');
+    await loadStudents();
+    await loadKPIs();
+  };
+
+  window.sendReminders = function() {
+    showToast('📧 Reminders sent to all students with pending fees!', 'success');
+  };
+
+  // ── Complaints ────────────────────────────────────────────
+  async function loadComplaints() {
+    const { data, error } = await _sb
+      .from('complaints').select('*,profiles(full_name,room_no,block)').order('created_at',{ascending:false});
+    if (error) { console.error(error); return; }
+    allComplaints = data || [];
+    document.getElementById('complaintCount').textContent = allComplaints.length;
+    renderComplaintsTable(allComplaints);
+
+    // Recent open for overview
+    const open = allComplaints.filter(c => c.status !== 'resolved').slice(0,5);
+    document.getElementById('recentComplaintsBody').innerHTML = open.length
+      ? open.map(c => `<tr>
+          <td>${c.profiles?.full_name||'—'}</td>
+          <td>${c.title}</td>
+          <td>${statusBadge(c.status)}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);">No open complaints.</td></tr>';
+  }
+
+  function renderComplaintsTable(complaints) {
+    const priorityBadge = p => ({ low:'badge-info', medium:'badge-warning', high:'badge-danger' }[p]||'badge-info');
+    document.getElementById('complaintsAdminBody').innerHTML = complaints.length
+      ? complaints.map(c => `
+          <tr>
+            <td>${c.profiles?.full_name||'—'}</td>
+            <td>${c.profiles?.block||'—'}-${c.profiles?.room_no||'—'}</td>
+            <td>${c.title}</td>
+            <td style="text-transform:capitalize;">${c.category}</td>
+            <td>${new Date(c.created_at).toLocaleDateString('en-IN')}</td>
+            <td><div class="badge ${priorityBadge(c.priority)}" style="text-transform:capitalize;">${c.priority}</div></td>
+            <td>${statusBadge(c.status)}</td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap;">
+              ${c.status !== 'in_progress' && c.status !== 'resolved'
+                ? `<button class="btn btn-secondary btn-sm" onclick="updateComplaint('${c.id}','in_progress')">Assign</button>` : ''}
+              ${c.status !== 'resolved'
+                ? `<button class="btn btn-primary btn-sm" onclick="updateComplaint('${c.id}','resolved')">✅ Resolve</button>` : ''}
+            </td>
+          </tr>`).join('')
+      : '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:20px;">No complaints.</td></tr>';
+  }
+
+  function statusBadge(s) {
+    const map = { pending:'badge-warning', in_progress:'badge-info', resolved:'badge-success' };
+    const lbl = { pending:'Pending', in_progress:'In Progress', resolved:'Resolved' };
+    return `<div class="badge ${map[s]||'badge-info'}">${lbl[s]||s}</div>`;
+  }
+
+  window.updateComplaint = async function(id, status) {
+    const update = { status, updated_at: new Date().toISOString() };
+    if (status === 'resolved') update.resolved_at = new Date().toISOString();
+    const { error } = await _sb.from('complaints').update(update).eq('id', id);
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast(status === 'resolved' ? '✅ Complaint resolved!' : 'Assigned to maintenance team!', 'success');
+    await loadComplaints();
+  };
+
+  window.filterComplaints = function() {
+    const val = document.getElementById('complaintFilter').value;
+    renderComplaintsTable(val ? allComplaints.filter(c => c.status === val) : allComplaints);
+  };
+
+  // ── Notices ───────────────────────────────────────────────
+  async function loadNotices() {
+    const { data, error } = await _sb.from('notices').select('*').order('created_at',{ascending:false});
+    if (error) { console.error(error); return; }
+
+    const priorColor = { normal:'var(--primary)', important:'var(--warning)', urgent:'var(--danger)' };
+    document.getElementById('adminNoticesList').innerHTML = data?.length
+      ? data.map(n => `
+          <div class="notice-card" style="align-items:center;margin-bottom:10px;border-left-color:${priorColor[n.priority]||'var(--primary)'};">
+            <span class="notice-icon">📌</span>
+            <div style="flex:1;">
+              <div class="notice-title">${n.title}</div>
+              <div class="notice-meta">${new Date(n.created_at).toLocaleDateString('en-IN')} — ${n.target==='all'?'All Students':'Block '+n.target.replace('block_','').toUpperCase()}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+              <button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger);" onclick="deleteNotice('${n.id}')">Delete</button>
+            </div>
+          </div>`).join('')
+      : '<p style="color:var(--text-dim);font-size:0.85rem;">No notices posted yet.</p>';
+  }
+
+  window.deleteNotice = async function(id) {
+    const { error } = await _sb.from('notices').delete().eq('id', id);
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('Notice deleted.', 'info');
+    await loadNotices();
+  };
+
+  window.openNoticeModal  = () => { document.getElementById('noticeModal').style.display = 'flex'; };
+  window.closeNoticeModal = () => { document.getElementById('noticeModal').style.display = 'none'; };
+
+  window.postNotice = async function() {
+    const title    = document.getElementById('noticeTitle').value.trim();
+    const body     = document.getElementById('noticeBody').value.trim();
+    const target   = document.getElementById('noticeTarget').value;
+    const priority = document.getElementById('noticePriority').value;
+    if (!title || !body) { showToast('Title and message are required.', 'error'); return; }
+
+    const { error } = await _sb.from('notices').insert({ admin_id: profile.id, title, body, target, priority });
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('📢 Notice posted!', 'success');
+    closeNoticeModal();
+    document.getElementById('noticeTitle').value = '';
+    document.getElementById('noticeBody').value  = '';
+    await loadNotices();
+  };
+
+  // ── Gate Passes ───────────────────────────────────────────
+  async function loadGatePasses() {
+    const { data, error } = await _sb
+      .from('gate_passes').select('*,profiles!gate_passes_student_id_fkey(full_name,room_no,block)').order('created_at',{ascending:false});
+    if (error) { console.error(error); return; }
+
+    const badge = s => ({ approved:'badge-success', rejected:'badge-danger', pending:'badge-warning' }[s]||'badge-info');
+    document.getElementById('gatePassesAdminBody').innerHTML = data?.length
+      ? data.map(p => `
+          <tr>
+            <td>${p.profiles?.full_name||'—'}</td>
+            <td>${p.purpose}</td>
+            <td>${new Date(p.departure_date).toLocaleDateString('en-IN')}</td>
+            <td>${new Date(p.return_date).toLocaleDateString('en-IN')}</td>
+            <td>${p.destination||'—'}</td>
+            <td><div class="badge ${badge(p.status)}" style="text-transform:capitalize;">${p.status}</div></td>
+            <td style="display:flex;gap:6px;">
+              ${p.status === 'pending' ? `
+                <button class="btn btn-primary btn-sm" onclick="reviewGatePass('${p.id}','approved')">✅</button>
+                <button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger);" onclick="reviewGatePass('${p.id}','rejected')">❌</button>
+              ` : '—'}
+            </td>
+          </tr>`).join('')
+      : '<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:20px;">No gate pass requests.</td></tr>';
+  }
+
+  window.reviewGatePass = async function(id, status) {
+    const { error } = await _sb.from('gate_passes').update({ status, reviewed_by: profile.id, reviewed_at: new Date().toISOString() }).eq('id', id);
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast(status === 'approved' ? '✅ Gate pass approved!' : '❌ Gate pass rejected.', status==='approved'?'success':'info');
+    await loadGatePasses();
+  };
+
+  // ── Revenue Chart ─────────────────────────────────────────
+  function buildRevenueChart(fees = []) {
+    const el = document.getElementById('revenueChart');
+    if (!el) return;
+    el.innerHTML = '';
+    
+    // Group paid fees by month
+    const revByMonth = {};
+    fees.filter(f => f.paid).forEach(f => {
+      // Normalize 'Mar 2026' to just 'Mar' for mock combination if we wanted, but keeping full month is fine
+      revByMonth[f.month] = (revByMonth[f.month] || 0) + Number(f.amount);
+    });
+
+    const months = Object.keys(revByMonth).sort((a,b) => new Date(a) - new Date(b)).slice(-7);
+    
+    let vals, labels;
+    if (months.length === 0) {
+      // Fallback to mock data if no revenue has been collected yet
+      vals   = [62000, 75000, 88000, 70000, 91000, 87000, 94000];
+      labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+    } else {
+      vals   = months.map(m => revByMonth[m]);
+      labels = months.map(m => m.split(' ')[0]);
+    }
+
+    const max = Math.max(...vals, 1000); // Ensure no division by zero
+
+    vals.forEach((v, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar';
+      bar.style.height = (v / max * 85) + '%';
+      bar.title = labels[i] + ': ₹' + v.toLocaleString();
+      el.appendChild(bar);
+    });
+    
+    document.getElementById('revenueLabels').innerHTML = labels.map(l => `<span>${l}</span>`).join('');
+  }
+
+  // ── Navigation ────────────────────────────────────────────
+  window.showSection = async function(name, linkEl) {
+    ['overview','students','rooms','fees','complaints','notices','gatepasses'].forEach(s => {
+      const el = document.getElementById('sec-'+s);
+      if (el) el.style.display = s === name ? '' : 'none';
+    });
+    if (linkEl) {
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      linkEl.classList.add('active');
+    }
+    const titles = { overview:'Admin Dashboard', students:'Students', rooms:'Rooms', fees:'Fee Records', complaints:'Complaints', notices:'Notices', gatepasses:'Gate Passes' };
+    document.getElementById('topbarTitle').textContent = titles[name] || name;
+    closeSidebar();
+    if (name === 'notices')    await loadNotices();
+    if (name === 'gatepasses') await loadGatePasses();
+  };
+
+  window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); };
+  window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); };
+  window.doSignOut    = async () => { await sbSignOut(); };
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — HostelHub</title>
+  <meta name="description" content="Sign in to your HostelHub account." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-bg"></div>
+
+    <a href="index.html" style="position:fixed;top:24px;left:24px;display:flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);z-index:10;" id="backLink">
+      ← Back to Home
+    </a>
+
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">🏠</div>
+        HostelHub
+      </div>
+
+      <h1 class="auth-title" style="font-size:1.6rem;">Welcome Back</h1>
+      <p class="auth-sub">Sign in to your account to continue</p>
+
+      <!-- Role Tabs -->
+      <div style="display:flex;background:var(--bg-card2);border-radius:var(--radius);padding:4px;margin-bottom:28px;">
+        <button class="role-tab active" id="tabStudent" onclick="setRole('student')">🎓 Student</button>
+        <button class="role-tab" id="tabAdmin" onclick="setRole('admin')">🛡️ Admin</button>
+      </div>
+
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-icon-wrap">
+            <span class="icon">✉️</span>
+            <input type="email" id="email" class="form-control" placeholder="you@hostel.edu" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-icon-wrap">
+            <span class="icon">🔒</span>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password" style="padding-right:44px;" />
+            <button type="button" onclick="togglePwd('password')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:1rem;cursor:pointer;background:none;border:none;">👁️</button>
+          </div>
+        </div>
+
+        <div class="remember-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember" />
+            Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+        </div>
+
+        <!-- Error message area -->
+        <div id="errorMsg" style="display:none;background:var(--danger-light);color:var(--danger);border-radius:var(--radius-sm);padding:10px 14px;font-size:0.85rem;border-left:3px solid var(--danger);"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn" style="margin-top:4px;">
+          Sign In →
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Create account</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <style>
+    .role-tab {
+      flex: 1; padding: 9px;
+      border-radius: calc(var(--radius) - 2px);
+      font-size: 0.875rem; font-weight: 600;
+      transition: var(--transition);
+      cursor: pointer; background: none; border: none;
+      color: var(--text-muted);
+    }
+    .role-tab.active {
+      background: var(--primary); color: #fff;
+      box-shadow: 0 2px 12px rgba(108,99,255,0.4);
+    }
+    #backLink:hover { color: var(--primary); transform: translateX(-4px); }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="scripts/supabase.js"></script>
+  <script src="scripts/main.js"></script>
+  <script>
+    // If already logged in, redirect immediately
+    sbGetSession().then(session => {
+      if (!session) return;
+      _sb.from('profiles').select('role').eq('id', session.user.id).single().then(({ data }) => {
+        if (data?.role === 'admin') window.location.href = 'admin-dashboard.html';
+        else window.location.href = 'student-dashboard.html';
+      });
+    });
+
+    let currentRole = 'student';
+
+    function setRole(role) {
+      currentRole = role;
+      document.getElementById('tabStudent').classList.toggle('active', role === 'student');
+      document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+    }
+
+    function togglePwd(id) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      if (!email) { showToast('Enter your email first.', 'error'); return; }
+      const { error } = await _sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/login.html'
+      });
+      if (error) showToast('Error: ' + error.message, 'error');
+      else showToast('✅ Password reset email sent! Check your inbox.', 'success');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('loginBtn');
+      const errDiv   = document.getElementById('errorMsg');
+      errDiv.style.display = 'none';
+
+      if (!email || !password) {
+        errDiv.textContent = 'Please fill in all fields.';
+        errDiv.style.display = 'block'; return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Signing in...';
+
+      try {
+        const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          errDiv.textContent = error.message === 'Invalid login credentials'
+            ? 'Invalid email or password. Please try again.'
+            : error.message;
+          errDiv.style.display = 'block';
+          btn.disabled = false; btn.innerHTML = 'Sign In →'; return;
+        }
+
+        // Fetch profile to determine role
+        const { data: profile, error: pErr } = await _sb
+          .from('profiles').select('role').eq('id', data.user.id).single();
+
+        if (pErr || !profile) {
+          errDiv.textContent = 'Profile not found. Please contact admin.';
+          errDiv.style.display = 'block';
+          btn.disabled = false; btn.innerHTML = 'Sign In →'; return;
+        }
+
+        // Enforce role tab match
+        if (profile.role !== currentRole) {
+          errDiv.textContent = `This account is a "${profile.role}" account. Please select the correct role tab.`;
+          errDiv.style.display = 'block';
+          await _sb.auth.signOut();
+          btn.disabled = false; btn.innerHTML = 'Sign In →'; return;
+        }
+
+        showToast('✅ Signed in! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = profile.role === 'admin'
+            ? 'admin-dashboard.html'
+            : 'student-dashboard.html';
+        }, 800);
+
+      } catch (err) {
+        errDiv.textContent = 'Something went wrong. Please try again.';
+        errDiv.style.display = 'block';
+        btn.disabled = false; btn.innerHTML = 'Sign In →';
+      }
+    });
+  </script>
+</body>
+</html>

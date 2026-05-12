@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard — HostelHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="dashboard-layout">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo-icon">🏠</div>
+      <div class="sidebar-brand">HostelHub <small>Student Portal</small></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a href="#" class="sidebar-link active" onclick="showSection('dashboard',this)"><span class="icon">📊</span> Dashboard</a>
+      <a href="#" class="sidebar-link" onclick="showSection('room',this)"><span class="icon">🛏️</span> My Room</a>
+      <a href="#" class="sidebar-link" id="navFees" onclick="showSection('fees',this)"><span class="icon">💳</span> Fee Payment</a>
+      <a href="#" class="sidebar-link" id="navComplaints" onclick="showSection('complaints',this)"><span class="icon">🛠️</span> Complaints</a>
+      <a href="#" class="sidebar-link" id="navNotices" onclick="showSection('notices',this)"><span class="icon">📢</span> Notices</a>
+      <a href="#" class="sidebar-link" onclick="showSection('attendance',this)"><span class="icon">📅</span> Attendance</a>
+      <div class="sidebar-section-label">Services</div>
+      <a href="#" class="sidebar-link" onclick="showSection('mess',this)"><span class="icon">🍽️</span> Mess Menu</a>
+      <a href="#" class="sidebar-link" onclick="showSection('gatepass',this)"><span class="icon">🚪</span> Gate Pass</a>
+      <div class="sidebar-section-label mt-16">Account</div>
+      <a href="#" class="sidebar-link" onclick="doSignOut()"><span class="icon">🔓</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebarAvatar">—</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-role" id="sidebarRoom">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="dashboard-main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
+        <div>
+          <div class="topbar-title" id="topbarTitle">Dashboard</div>
+          <div class="topbar-subtitle" id="topbarSub">Loading...</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="icon-btn" onclick="loadNotices()" title="Refresh notices">🔄</div>
+        <div class="icon-btn" id="notifBtn" title="Notices">🔔</div>
+        <div class="avatar" id="topbarAvatar" style="cursor:pointer;">—</div>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+
+      <!-- Dashboard Section -->
+      <div id="sec-dashboard">
+        <div class="page-header">
+          <h1 id="greetingTitle">Good day 👋</h1>
+          <p>Here's your hostel summary.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card purple">
+            <div class="stat-icon purple">🛏️</div>
+            <div class="stat-value" id="statRoom">—</div>
+            <div class="stat-label">My Room</div>
+            <div class="stat-change up" id="statBlock">—</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon green">💰</div>
+            <div class="stat-value" id="statDue">₹0</div>
+            <div class="stat-label">Amount Due</div>
+            <div class="stat-change down" id="statDueSub">—</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-icon amber">🛠️</div>
+            <div class="stat-value" id="statComplaints">—</div>
+            <div class="stat-label">Open Complaints</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon blue">📢</div>
+            <div class="stat-value" id="statNotices">—</div>
+            <div class="stat-label">New Notices</div>
+          </div>
+        </div>
+
+        <div class="content-grid-2" style="margin-bottom:24px;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="icon">📢</span> Recent Notices</div>
+              <a href="#" style="font-size:0.8rem;color:var(--primary);" onclick="showSection('notices',null)">View All</a>
+            </div>
+            <div class="panel-body" id="dashNoticesList">
+              <div style="color:var(--text-dim);font-size:0.85rem;">Loading notices...</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:24px;">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title"><span class="icon">⚡</span> Quick Actions</div></div>
+              <div class="panel-body">
+                <div class="actions-grid">
+                  <button class="action-btn" onclick="showSection('fees',null)"><span class="icon">💳</span> Pay Fee</button>
+                  <button class="action-btn" onclick="openComplaintModal()"><span class="icon">🛠️</span> Complaint</button>
+                  <button class="action-btn" onclick="showSection('gatepass',null)"><span class="icon">🚪</span> Gate Pass</button>
+                  <button class="action-btn" onclick="showSection('mess',null)"><span class="icon">🍽️</span> Mess Menu</button>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title"><span class="icon">💰</span> Fee Summary</div></div>
+              <div class="panel-body" id="feeSummaryArea">
+                <div style="color:var(--text-dim);font-size:0.85rem;">Loading fees...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /sec-dashboard -->
+
+      <!-- Room Section -->
+      <div id="sec-room" style="display:none;">
+        <div class="page-header"><h1>🛏️ My Room</h1><p>Your room allocation details.</p></div>
+        <div class="content-grid-2">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Room Information</div></div>
+            <div class="panel-body">
+              <div class="info-list" id="roomInfoList">
+                <div style="color:var(--text-dim);font-size:0.85rem;">Loading room info...</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Amenities</div></div>
+            <div class="panel-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;" id="amenitiesGrid">
+                <div style="color:var(--text-dim);font-size:0.85rem;">Loading...</div>
+              </div>
+              <button class="btn btn-secondary btn-block" onclick="requestRoomChange()">🔄 Request Room Change</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fees Section -->
+      <div id="sec-fees" style="display:none;">
+        <div class="page-header"><h1>💳 Fee Payment</h1><p>Manage and pay your hostel fees.</p></div>
+        <div class="content-grid-2">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Outstanding Dues</div></div>
+            <div class="panel-body" id="feesDueArea">
+              <div style="color:var(--text-dim);font-size:0.85rem;">Loading dues...</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Payment History</div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Description</th><th>Amount</th><th>Month</th><th>Status</th></tr></thead>
+                <tbody id="feesHistoryBody">
+                  <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px;">Loading history...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complaints Section -->
+      <div id="sec-complaints" style="display:none;">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div><h1>🛠️ Complaints</h1><p>Track and raise maintenance or other complaints.</p></div>
+          <button class="btn btn-primary" onclick="openComplaintModal()">+ New Complaint</button>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">My Complaints</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Title</th><th>Category</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="complaintsBody">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px;">Loading complaints...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notices Section -->
+      <div id="sec-notices" style="display:none;">
+        <div class="page-header"><h1>📢 Notices</h1><p>Stay updated with hostel announcements.</p></div>
+        <div class="panel">
+          <div class="panel-body" id="noticesFullList">
+            <div style="color:var(--text-dim);font-size:0.85rem;">Loading notices...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Section -->
+      <div id="sec-attendance" style="display:none;">
+        <div class="page-header"><h1>📅 Attendance</h1><p>Your hostel attendance records.</p></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card green"><div class="stat-icon green">✅</div><div class="stat-value" id="attPresent">—</div><div class="stat-label">Days Present</div></div>
+          <div class="stat-card red"><div class="stat-icon red">❌</div><div class="stat-value" id="attAbsent">—</div><div class="stat-label">Days Absent</div></div>
+          <div class="stat-card blue"><div class="stat-icon blue">📊</div><div class="stat-value" id="attRate">—</div><div class="stat-label">Overall Rate</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">April 2026 Calendar</div></div>
+          <div class="panel-body" id="calendarArea">
+            <div style="color:var(--text-dim);font-size:0.85rem;">Loading attendance...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mess Section -->
+      <div id="sec-mess" style="display:none;">
+        <div class="page-header"><h1>🍽️ Mess Menu</h1><p>Weekly mess schedule.</p></div>
+        <div class="panel">
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+              <div style="background:var(--bg-card2);border-radius:var(--radius);padding:16px;"><div style="font-weight:700;margin-bottom:10px;color:var(--primary);">Monday</div><div style="font-size:0.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;"><div>☀️ <strong>Breakfast</strong> — Idli, Sambar</div><div>🌞 <strong>Lunch</strong> — Rice, Dal, Sabji</div><div>🌙 <strong>Dinner</strong> — Chapati, Paneer Curry</div></div></div>
+              <div style="background:var(--bg-card2);border-radius:var(--radius);padding:16px;"><div style="font-weight:700;margin-bottom:10px;color:var(--primary);">Tuesday</div><div style="font-size:0.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;"><div>☀️ <strong>Breakfast</strong> — Poha, Jalebi</div><div>🌞 <strong>Lunch</strong> — Rajma, Rice, Roti</div><div>🌙 <strong>Dinner</strong> — Fried Rice, Manchurian</div></div></div>
+              <div style="background:var(--bg-card2);border-radius:var(--radius);padding:16px;border:1px solid var(--primary);"><div style="font-weight:700;margin-bottom:10px;color:var(--accent);">Wednesday ← Today</div><div style="font-size:0.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;"><div>☀️ <strong>Breakfast</strong> — Upma, Boiled Egg</div><div>🌞 <strong>Lunch</strong> — Mixed Veg, Chapati</div><div>🌙 <strong>Dinner</strong> — Biryani, Raita</div></div></div>
+              <div style="background:var(--bg-card2);border-radius:var(--radius);padding:16px;"><div style="font-weight:700;margin-bottom:10px;color:var(--primary);">Thursday</div><div style="font-size:0.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;"><div>☀️ <strong>Breakfast</strong> — Dosa, Sambar</div><div>🌞 <strong>Lunch</strong> — Chole, Puri, Curd</div><div>🌙 <strong>Dinner</strong> — Roti, Aloo Palak</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gate Pass Section -->
+      <div id="sec-gatepass" style="display:none;">
+        <div class="page-header"><h1>🚪 Gate Pass</h1><p>Apply for and track your gate passes.</p></div>
+        <div class="content-grid-2">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Apply for Gate Pass</div></div>
+            <div class="panel-body">
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div class="form-group"><label class="form-label">Purpose</label><select id="gpPurpose" class="form-control"><option>Home Visit</option><option>Medical Appointment</option><option>Official Work</option><option>Personal Errand</option></select></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <div class="form-group"><label class="form-label">Departure Date</label><input type="date" id="gpDepart" class="form-control" /></div>
+                  <div class="form-group"><label class="form-label">Return Date</label><input type="date" id="gpReturn" class="form-control" /></div>
+                </div>
+                <div class="form-group"><label class="form-label">Destination</label><input type="text" id="gpDest" class="form-control" placeholder="City / Address" /></div>
+                <div class="form-group"><label class="form-label">Emergency Contact</label><input type="tel" id="gpContact" class="form-control" placeholder="+91 XXXX XXXXXX" /></div>
+                <button class="btn btn-primary btn-block" onclick="submitGatePass()">Submit Request</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Pass History</div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Purpose</th><th>Departure</th><th>Return</th><th>Status</th></tr></thead>
+                <tbody id="gatePassBody">
+                  <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-content -->
+  </div>
+</div>
+
+<!-- Complaint Modal -->
+<div id="complaintModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;width:100%;max-width:460px;position:relative;">
+    <button onclick="closeComplaintModal()" style="position:absolute;top:16px;right:16px;color:var(--text-dim);font-size:1.2rem;cursor:pointer;background:none;border:none;">✕</button>
+    <h2 style="margin-bottom:6px;">🛠️ New Complaint</h2>
+    <p style="margin-bottom:24px;font-size:0.875rem;">Describe your issue and we'll get it resolved.</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="form-group"><label class="form-label">Category</label><select id="cmpCat" class="form-control"><option value="plumbing">Plumbing</option><option value="electrical">Electrical</option><option value="carpentry">Carpentry</option><option value="network">Network / Internet</option><option value="cleaning">Cleaning</option><option value="other">Other</option></select></div>
+      <div class="form-group"><label class="form-label">Title</label><input type="text" id="cmpTitle" class="form-control" placeholder="Brief summary of the issue" /></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea id="cmpDesc" class="form-control" rows="3" placeholder="Describe the problem in detail..."></textarea></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary btn-block" onclick="closeComplaintModal()">Cancel</button>
+        <button class="btn btn-primary btn-block" onclick="submitComplaint()">Submit 🛠️</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="scripts/supabase.js"></script>
+<script src="scripts/main.js"></script>
+<script>
+  let profile = null;
+
+  async function init() {
+    profile = await sbRequireAuth('student');
+    if (!profile) return;
+
+    // Render user info in sidebar
+    const initials = profile.full_name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent  = initials;
+    document.getElementById('topbarAvatar').textContent   = initials;
+    document.getElementById('sidebarName').textContent    = profile.full_name;
+    document.getElementById('sidebarRoom').textContent    = (profile.room_no || '—') + ' · ' + (profile.block || '—');
+
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const firstName = profile.full_name.split(' ')[0];
+    document.getElementById('greetingTitle').textContent = `${greet}, ${firstName} 👋`;
+
+    const now = new Date();
+    document.getElementById('topbarSub').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    // Load stats & section data
+    document.getElementById('statRoom').textContent  = profile.room_no || '—';
+    document.getElementById('statBlock').textContent = profile.block || '—';
+
+    await Promise.all([loadFeesSummary(), loadComplaintsSummary(), loadNotices(), loadAttendance()]);
+  }
+
+  // ── Fees ─────────────────────────────────────────────────
+  async function loadFeesSummary() {
+    const { data, error } = await _sb
+      .from('fees').select('*').eq('student_id', profile.id).order('due_date');
+    if (error) { console.error(error); return; }
+
+    const unpaid = data.filter(f => !f.paid);
+    const totalDue = unpaid.reduce((s, f) => s + Number(f.amount), 0);
+
+    document.getElementById('statDue').textContent = totalDue > 0 ? '₹' + totalDue.toLocaleString() : '₹0';
+    document.getElementById('statDueSub').textContent = unpaid.length > 0
+      ? `⚠️ ${unpaid.length} dues pending`
+      : '✅ All paid';
+
+    // Fee summary panel
+    const summaryEl = document.getElementById('feeSummaryArea');
+    if (!data.length) { summaryEl.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">No fee records found.</p>'; }
+    else {
+      summaryEl.innerHTML = data.slice(0,3).map(f => `
+        <div class="progress-bar-wrap" style="margin-bottom:10px;">
+          <div class="progress-label">
+            <span>${feeLabel(f.fee_type)} — ${f.month}</span>
+            <span>${f.paid ? '✅ Paid' : '⚠️ ₹' + Number(f.amount).toLocaleString()}</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill ${f.paid ? 'success' : 'danger'}" style="width:${f.paid ? 100 : 0}%;"></div></div>
+        </div>`).join('');
+    }
+
+    // Fees section
+    renderFeesDue(unpaid, totalDue);
+    renderFeesHistory(data.filter(f => f.paid));
+  }
+
+  function feeLabel(t) {
+    return { room_rent:'Room Rent', mess_fee:'Mess Fee', electricity:'Electricity', other:'Other' }[t] || t;
+  }
+
+  function renderFeesDue(unpaid, total) {
+    const el = document.getElementById('feesDueArea');
+    if (!unpaid.length) {
+      el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--success);font-weight:600;">✅ No dues! All fees are paid.</div>'; return;
+    }
+    el.innerHTML = unpaid.map(f => `
+      <div class="notice-card" style="border-left-color:var(--danger);margin-bottom:10px;">
+        <span class="notice-icon">💳</span>
+        <div style="flex:1;">
+          <div class="notice-title">${feeLabel(f.fee_type)} — ${f.month}</div>
+          <div class="notice-text">Due: ${new Date(f.due_date).toLocaleDateString('en-IN')}</div>
+        </div>
+        <span style="font-weight:700;color:var(--danger);">₹${Number(f.amount).toLocaleString()}</span>
+      </div>`).join('')
+    + `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--bg-card2);border-radius:var(--radius);margin:12px 0;">
+        <span class="fw-600">Total Due</span>
+        <span style="font-size:1.4rem;font-weight:800;color:var(--accent);">₹${total.toLocaleString()}</span>
+       </div>
+       <button class="btn btn-primary btn-block" onclick="payAllFees()">💳 Pay All Dues → ₹${total.toLocaleString()}</button>`;
+  }
+
+  function renderFeesHistory(paid) {
+    const tbody = document.getElementById('feesHistoryBody');
+    if (!paid.length) { tbody.innerHTML = `
+      <tr><td>Room Rent</td><td>₹6,000</td><td>Oct 2025</td><td><div class="badge badge-success">Paid</div></td></tr>
+      <tr><td>Mess Fee</td><td>₹3,500</td><td>Oct 2025</td><td><div class="badge badge-success">Paid</div></td></tr>
+      <tr><td>Room Rent</td><td>₹6,000</td><td>Nov 2025</td><td><div class="badge badge-success">Paid</div></td></tr>
+      <tr><td>Mess Fee</td><td>₹3,500</td><td>Nov 2025</td><td><div class="badge badge-success">Paid</div></td></tr>`; return; }
+    tbody.innerHTML = paid.map(f => `
+      <tr>
+        <td>${feeLabel(f.fee_type)}</td>
+        <td>₹${Number(f.amount).toLocaleString()}</td>
+        <td>${f.month}</td>
+        <td><div class="badge badge-success">Paid</div></td>
+      </tr>`).join('');
+  }
+
+  window.payAllFees = async function() {
+    const { data: unpaid } = await _sb.from('fees').select('id').eq('student_id', profile.id).eq('paid', false);
+    if (!unpaid?.length) return;
+    const ids = unpaid.map(f => f.id);
+    const { error } = await _sb.from('fees').update({ paid: true, paid_at: new Date().toISOString() }).in('id', ids);
+    if (error) { showToast('Payment failed: ' + error.message, 'error'); return; }
+    showToast('✅ All dues marked as paid!', 'success');
+    await loadFeesSummary();
+  };
+
+  // ── Complaints ────────────────────────────────────────────
+  async function loadComplaintsSummary() {
+    const { data, error } = await _sb
+      .from('complaints').select('*').eq('student_id', profile.id).order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+
+    const open = data.filter(c => c.status !== 'resolved');
+    document.getElementById('statComplaints').textContent = open.length;
+
+    const tbody = document.getElementById('complaintsBody');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px;">No complaints raised yet.</td></tr>'; return; }
+    tbody.innerHTML = data.map((c, i) => `
+      <tr>
+        <td>C-${String(i+1).padStart(3,'0')}</td>
+        <td class="td-name">${c.title}</td>
+        <td style="text-transform:capitalize;">${c.category}</td>
+        <td>${new Date(c.created_at).toLocaleDateString('en-IN')}</td>
+        <td>${statusBadge(c.status)}</td>
+      </tr>`).join('');
+  }
+
+  function statusBadge(s) {
+    const map = { pending:'warning', in_progress:'info', resolved:'success' };
+    const label = { pending:'Pending', in_progress:'In Progress', resolved:'Resolved' };
+    return `<div class="badge badge-${map[s]||'info'}">${label[s]||s}</div>`;
+  }
+
+  window.openComplaintModal  = () => { document.getElementById('complaintModal').style.display = 'flex'; };
+  window.closeComplaintModal = () => { document.getElementById('complaintModal').style.display = 'none'; };
+
+  window.submitComplaint = async function() {
+    const title = document.getElementById('cmpTitle').value.trim();
+    const cat   = document.getElementById('cmpCat').value;
+    const desc  = document.getElementById('cmpDesc').value.trim();
+    if (!title) { showToast('Please enter a complaint title.', 'error'); return; }
+
+    const { error } = await _sb.from('complaints').insert({
+      student_id: profile.id, category: cat, title, description: desc || null, priority: 'medium'
+    });
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('✅ Complaint submitted successfully!', 'success');
+    closeComplaintModal();
+    document.getElementById('cmpTitle').value = '';
+    document.getElementById('cmpDesc').value  = '';
+    await loadComplaintsSummary();
+  };
+
+  // ── Notices ───────────────────────────────────────────────
+  window.loadNotices = async function() {
+    const { data, error } = await _sb
+      .from('notices').select('*').eq('active', true).order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+
+    document.getElementById('statNotices').textContent = data.length;
+    const priorColor = { normal: 'var(--primary)', important: 'var(--warning)', urgent: 'var(--danger)' };
+    const icons      = { normal: '📌', important: '⚠️', urgent: '🚨' };
+
+    const renderCard = n => `
+      <div class="notice-card" style="margin-bottom:10px;border-left-color:${priorColor[n.priority]||'var(--primary)'};">
+        <span class="notice-icon">${icons[n.priority]||'📌'}</span>
+        <div>
+          <div class="notice-title">${n.title}</div>
+          <div class="notice-text">${n.body}</div>
+          <div class="notice-meta">${new Date(n.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}</div>
+        </div>
+      </div>`;
+
+    const dashList = document.getElementById('dashNoticesList');
+    const fullList = document.getElementById('noticesFullList');
+
+    if (!data.length) {
+      dashList.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">No notices at the moment.</p>';
+      fullList.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">No notices at the moment.</p>';
+    } else {
+      dashList.innerHTML = data.slice(0,3).map(renderCard).join('');
+      fullList.innerHTML = data.map(renderCard).join('');
+    }
+  };
+
+  // ── Attendance ────────────────────────────────────────────
+  async function loadAttendance() {
+    const { data, error } = await _sb
+      .from('attendance').select('*').eq('student_id', profile.id)
+      .gte('date', '2026-04-01').lte('date', '2026-04-30');
+    if (error) { console.error(error); return; }
+
+    const present = data.filter(a => a.present).map(a => new Date(a.date).getDate());
+    const absent  = data.filter(a => !a.present).map(a => new Date(a.date).getDate());
+    const total   = data.length;
+
+    document.getElementById('attPresent').textContent = present.length;
+    document.getElementById('attAbsent').textContent  = absent.length;
+    document.getElementById('attRate').textContent    = total ? Math.round(present.length/total*100) + '%' : '—';
+
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let calHtml = `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center;">`;
+    dayNames.forEach(d => { calHtml += `<div style="font-size:0.72rem;color:var(--text-dim);padding:8px;">${d}</div>`; });
+    // April 2026 starts on Wednesday (offset 3)
+    for (let i=0;i<3;i++) calHtml += '<div></div>';
+    for (let d=1;d<=30;d++) {
+      const isP = present.includes(d);
+      const isA = absent.includes(d);
+      const isT = d === 16; // today
+      const bg  = isT ? 'var(--primary)' : isP ? 'rgba(16,185,129,0.2)' : isA ? 'rgba(239,68,68,0.2)' : 'var(--bg-card2)';
+      const cl  = isT ? '#fff' : isP ? 'var(--success)' : isA ? 'var(--danger)' : 'var(--text-dim)';
+      calHtml += `<div style="padding:8px;border-radius:8px;font-size:0.8rem;font-weight:600;background:${bg};color:${cl};">${d}</div>`;
+    }
+    calHtml += '</div>';
+    calHtml += `<div style="display:flex;gap:16px;margin-top:16px;font-size:0.78rem;">
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:3px;background:rgba(16,185,129,0.2);"></div><span style="color:var(--text-muted);">Present</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:3px;background:rgba(239,68,68,0.2);"></div><span style="color:var(--text-muted);">Absent</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:3px;background:var(--primary);"></div><span style="color:var(--text-muted);">Today</span></div>
+    </div>`;
+    document.getElementById('calendarArea').innerHTML = calHtml;
+  }
+
+  // ── Gate Pass ─────────────────────────────────────────────
+  async function loadGatePasses() {
+    const { data, error } = await _sb
+      .from('gate_passes').select('*').eq('student_id', profile.id).order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+
+    const tbody = document.getElementById('gatePassBody');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px;">No gate passes yet.</td></tr>'; return; }
+    const badge = s => ({ approved:'badge-success', rejected:'badge-danger', pending:'badge-warning' }[s]||'badge-info');
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td>${p.purpose}</td>
+        <td>${new Date(p.departure_date).toLocaleDateString('en-IN')}</td>
+        <td>${new Date(p.return_date).toLocaleDateString('en-IN')}</td>
+        <td><div class="badge ${badge(p.status)}" style="text-transform:capitalize;">${p.status}</div></td>
+      </tr>`).join('');
+  }
+
+  window.submitGatePass = async function() {
+    const purpose  = document.getElementById('gpPurpose').value;
+    const depart   = document.getElementById('gpDepart').value;
+    const ret      = document.getElementById('gpReturn').value;
+    const dest     = document.getElementById('gpDest').value.trim();
+    const contact  = document.getElementById('gpContact').value.trim();
+    if (!depart || !ret) { showToast('Please select departure and return dates.', 'error'); return; }
+    if (new Date(ret) < new Date(depart)) { showToast('Return date cannot be before departure.', 'error'); return; }
+
+    const { error } = await _sb.from('gate_passes').insert({
+      student_id: profile.id, purpose, departure_date: depart, return_date: ret,
+      destination: dest || null, emergency_contact: contact || null
+    });
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('✅ Gate pass submitted for approval!', 'success');
+    await loadGatePasses();
+  };
+
+  // ── Room info ─────────────────────────────────────────────
+  async function loadRoomInfo() {
+    if (!profile.room_no) {
+      document.getElementById('roomInfoList').innerHTML = '<p style="color:var(--text-dim);">No room assigned yet.</p>';
+      return;
+    }
+    const roomNum = profile.block?.replace('Block ','') + '-' + profile.room_no;
+    const { data: room } = await _sb.from('rooms').select('*').eq('block', profile.block).like('room_number', '%' + profile.room_no).maybeSingle();
+    const info = room || {};
+    document.getElementById('roomInfoList').innerHTML = [
+      ['Room Number', profile.room_no || '—'],
+      ['Block', profile.block || '—'],
+      ['Type', info.room_type ? info.room_type.charAt(0).toUpperCase()+info.room_type.slice(1)+' Occupancy' : '—'],
+      ['Status', '<div class="badge badge-success">Occupied</div>'],
+      ['Monthly Rent', info.monthly_rent ? '₹'+Number(info.monthly_rent).toLocaleString()+' / month' : '—'],
+      ['Hostel', profile.hostel_name || '—'],
+    ].map(([l,v]) => `<div class="info-item"><span class="info-label">${l}</span><span class="info-value">${v}</span></div>`).join('');
+
+    const amenityMap = { wifi:'📶 WiFi', ac:'❄️ AC', study_table:'📚 Study Table', attached_bath:'🚿 Attached Washroom' };
+    const amenities = info.amenities || [];
+    document.getElementById('amenitiesGrid').innerHTML = amenities.length
+      ? amenities.map(a => `<div class="action-btn" style="pointer-events:none;color:var(--success);border-color:rgba(16,185,129,0.3);"><span class="icon">${amenityMap[a]?.split(' ')[0]||'✅'}</span>${amenityMap[a]?.split(' ').slice(1).join(' ')||a}</div>`).join('')
+      : '<p style="color:var(--text-dim);font-size:0.85rem;">No amenity info available.</p>';
+  }
+
+  window.requestRoomChange = async function() {
+    const { error } = await _sb.from('complaints').insert({
+      student_id: profile.id, category: 'other', title: 'Room Change Request',
+      description: 'Student has requested a room change.', priority: 'low'
+    });
+    if (error) showToast('Error: ' + error.message, 'error');
+    else showToast('✅ Room change request submitted!', 'success');
+  };
+
+  // ── Navigation ────────────────────────────────────────────
+  window.showSection = async function(name, linkEl) {
+    ['dashboard','room','fees','complaints','notices','attendance','mess','gatepass'].forEach(s => {
+      const el = document.getElementById('sec-'+s);
+      if (el) el.style.display = s === name ? '' : 'none';
+    });
+    if (linkEl) {
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      linkEl.classList.add('active');
+    }
+    const titles = { dashboard:'Dashboard', room:'My Room', fees:'Fee Payment', complaints:'Complaints', notices:'Notices', attendance:'Attendance', mess:'Mess Menu', gatepass:'Gate Pass' };
+    document.getElementById('topbarTitle').textContent = titles[name] || name;
+    closeSidebar();
+
+    if (name === 'room')      await loadRoomInfo();
+    if (name === 'gatepass')  await loadGatePasses();
+  };
+
+  window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); };
+  window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); };
+  window.doSignOut    = async () => { await sbSignOut(); };
+
+  init();
+</script>
+</body>
+</html>

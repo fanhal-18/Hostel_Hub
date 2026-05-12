@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HostelHub — Modern Hostel Management System</title>
+  <meta name="description" content="HostelHub is a smart, modern hostel management system for students and administrators. Manage rooms, fees, complaints and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-visual-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow-glow);
+      position: relative;
+      animation: float 5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-14px); }
+    }
+    .mini-stat-row { display: flex; gap: 12px; margin-bottom: 16px; }
+    .mini-stat {
+      flex: 1;
+      background: var(--bg-card2);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+    .mini-stat .num {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .mini-stat .lbl { font-size: 0.68rem; color: var(--text-dim); margin-top: 2px; }
+    .mini-notice {
+      background: var(--bg-card2);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+    }
+    .mini-notice:last-child { margin-bottom: 0; }
+    .mini-notice .ni { font-size: 1rem; flex-shrink: 0; }
+    .mini-notice .nt { color: var(--text-muted); }
+    .mini-notice .nt strong { color: var(--text); display: block; font-size: 0.85rem; }
+    .floating-badge {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+    .floating-badge.top-left  { top: 30px; left: -50px; }
+    .floating-badge.bot-right { bottom: 30px; right: -50px; }
+    .fb-icon { font-size: 1.2rem; }
+    .fb-txt strong { display: block; font-weight: 700; font-size: 0.9rem; }
+    .fb-txt span   { color: var(--text-dim); font-size: 0.72rem; }
+
+    /* How it works */
+    .steps-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: calc(12.5% + 20px);
+      right: calc(12.5% + 20px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      z-index: 0;
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      transition: var(--transition);
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: var(--border-hover); }
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin: 0 auto 16px;
+    }
+    .step-title { font-size: 0.95rem; margin-bottom: 8px; }
+
+    /* Testimonials */
+    .testimonials-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: var(--transition);
+    }
+    .testi-card:hover { transform: translateY(-4px); border-color: var(--border-hover); }
+    .testi-stars { color: #f59e0b; font-size: 0.9rem; margin-bottom: 14px; }
+    .testi-text  { font-size: 0.92rem; line-height: 1.7; margin-bottom: 20px; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; color: #fff;
+    }
+    .testi-name  { font-size: 0.875rem; font-weight: 600; }
+    .testi-role  { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* CTA */
+    .cta-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+    .cta-inner {
+      background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(255,101,132,0.1));
+      border: 1px solid rgba(108,99,255,0.3);
+      border-radius: var(--radius-xl);
+      padding: 80px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-inner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(108,99,255,0.2), transparent);
+    }
+    .cta-inner > * { position: relative; z-index: 1; }
+    .cta-title { font-size: clamp(1.8rem, 4vw, 3rem); margin-bottom: 16px; }
+    .cta-desc { font-size: 1.05rem; max-width: 500px; margin: 0 auto 36px; }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid::before { display: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .floating-badge { display: none; }
+      .cta-inner { padding: 48px 24px; }
+    }
+    @media (max-width: 480px) {
+      .steps-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ──────────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand">
+      <div class="logo-icon">🏠</div>
+      HostelHub
+    </a>
+    <ul class="navbar-nav" id="navMenu">
+      <li><a href="#features" class="nav-link">Features</a></li>
+      <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+      <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-secondary btn-sm" id="loginBtn">Log In</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+      <div class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Mobile Nav ──────────────────────────────────────── -->
+  <div id="mobileNav" style="display:none;position:fixed;top:65px;left:0;right:0;z-index:999;background:var(--bg-card);border-bottom:1px solid var(--border);padding:20px;flex-direction:column;gap:12px;">
+    <a href="#features" class="nav-link" onclick="toggleNav()">Features</a>
+    <a href="#how-it-works" class="nav-link" onclick="toggleNav()">How It Works</a>
+    <a href="#testimonials" class="nav-link" onclick="toggleNav()">Reviews</a>
+    <a href="#contact" class="nav-link" onclick="toggleNav()">Contact</a>
+    <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
+    <a href="login.html" class="btn btn-secondary btn-sm btn-block">Log In</a>
+    <a href="register.html" class="btn btn-primary btn-sm btn-block">Get Started</a>
+  </div>
+
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-bg-grid"></div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Trusted by 500+ institutions
+        </div>
+        <h1 class="hero-title">
+          Smart Hostel<br/>
+          Management<br/>
+          <span class="gradient-text">Made Simple</span>
+        </h1>
+        <p class="hero-desc">
+          HostelHub streamlines everything from room allocation and fee collection to complaints and announcements — all in one powerful platform.
+        </p>
+        <div class="hero-actions">
+          <a href="register.html" class="btn btn-primary btn-lg">
+            🚀 Start Free Trial
+          </a>
+          <a href="login.html" class="btn btn-secondary btn-lg">
+            👀 View Demo
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">98%</div>
+            <div class="hero-stat-label">Uptime SLA</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">12k+</div>
+            <div class="hero-stat-label">Students Managed</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">340+</div>
+            <div class="hero-stat-label">Hostels</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Preview Card -->
+      <div class="hero-visual">
+        <div class="floating-badge top-left">
+          <span class="fb-icon">✅</span>
+          <div class="fb-txt">
+            <strong>Room Allocated</strong>
+            <span>Block A · Room 204</span>
+          </div>
+        </div>
+        <div class="hero-visual-card fade-up">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div>
+              <div style="font-weight:700;font-size:0.95rem;">📊 Hostel Overview</div>
+              <div style="font-size:0.72rem;color:var(--text-dim);">Academic Year 2025–26</div>
+            </div>
+            <div class="badge badge-success">● Live</div>
+          </div>
+          <div class="mini-stat-row">
+            <div class="mini-stat"><div class="num">242</div><div class="lbl">Total Rooms</div></div>
+            <div class="mini-stat"><div class="num">218</div><div class="lbl">Occupied</div></div>
+            <div class="mini-stat"><div class="num">24</div><div class="lbl">Vacant</div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:6px;">
+              <span style="color:var(--text-muted)">Occupancy Rate</span>
+              <span style="font-weight:700;">90%</span>
+            </div>
+            <div style="height:6px;background:var(--bg-card2);border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:90%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:99px;"></div>
+            </div>
+          </div>
+          <div class="mini-notice">
+            <span class="ni">🔔</span>
+            <div class="nt"><strong>Fee Deadline Approaching</strong>October fees due in 3 days</div>
+          </div>
+          <div class="mini-notice">
+            <span class="ni">🛠️</span>
+            <div class="nt"><strong>Maintenance Request</strong>Plumbing — Block B, Room 112</div>
+          </div>
+        </div>
+        <div class="floating-badge bot-right">
+          <span class="fb-icon">💰</span>
+          <div class="fb-txt">
+            <strong>₹4,200 Collected</strong>
+            <span>Today's payments</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Marquee ─────────────────────────────────────────── -->
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <div class="marquee-item"><span class="marquee-dot"></span>Room Allocation</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Fee Management</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Complaint Tracking</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Notice Board</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Student Records</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Attendance</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Mess Management</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Gate Pass</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Room Allocation</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Fee Management</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Complaint Tracking</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Notice Board</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Student Records</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Attendance</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Mess Management</div>
+      <div class="marquee-item"><span class="marquee-dot"></span>Gate Pass</div>
+    </div>
+  </div>
+
+  <!-- ── Features ───────────────────────────────────────── -->
+  <section class="section section-center" id="features">
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">Everything You Need, <span class="gradient-text">All in One Place</span></h2>
+    <p class="section-desc">HostelHub gives students and administrators a powerful, intuitive platform to manage every aspect of hostel life.</p>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(108,99,255,0.15);">🏠</div>
+        <h3 class="feature-title">Room Management</h3>
+        <p style="font-size:0.875rem;">Easily allocate, swap, and track rooms. View real-time occupancy and manage room types and amenities.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.1s;">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15);">💳</div>
+        <h3 class="feature-title">Fee Collection</h3>
+        <p style="font-size:0.875rem;">Track payments, generate invoices, send automated reminders, and view financial reports effortlessly.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.2s;">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.15);">🛠️</div>
+        <h3 class="feature-title">Complaint System</h3>
+        <p style="font-size:0.875rem;">Students submit maintenance or other complaints which admins can track, assign, and resolve in real-time.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.3s;">
+        <div class="feature-icon" style="background:rgba(59,130,246,0.15);">📢</div>
+        <h3 class="feature-title">Notice Board</h3>
+        <p style="font-size:0.875rem;">Pin announcements, circulars, and event notices. Students get instant notifications for important updates.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.4s;">
+        <div class="feature-icon" style="background:rgba(255,101,132,0.15);">📊</div>
+        <h3 class="feature-title">Admin Analytics</h3>
+        <p style="font-size:0.875rem;">Comprehensive dashboards with occupancy trends, revenue charts, complaint resolution rates, and more.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.5s;">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15);">🔒</div>
+        <h3 class="feature-title">Secure & Private</h3>
+        <p style="font-size:0.875rem;">Role-based access ensures students only see their data while admins can manage the full system securely.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it Works ────────────────────────────────────── -->
+  <section class="section section-center" id="how-it-works" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="section-tag">Process</div>
+    <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+    <p class="section-desc">Get your hostel up and running on HostelHub in just four simple steps.</p>
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <div class="step-num">1</div>
+        <h3 class="step-title">Register Institution</h3>
+        <p style="font-size:0.82rem;">Sign up your hostel and configure rooms, blocks, and available amenities.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.1s;">
+        <div class="step-num">2</div>
+        <h3 class="step-title">Onboard Students</h3>
+        <p style="font-size:0.82rem;">Students register and are allocated rooms. All records are managed automatically.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.2s;">
+        <div class="step-num">3</div>
+        <h3 class="step-title">Manage Daily Ops</h3>
+        <p style="font-size:0.82rem;">Handle fees, complaints, notices, and attendance from a single dashboard.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.3s;">
+        <div class="step-num">4</div>
+        <h3 class="step-title">Analyse & Grow</h3>
+        <p style="font-size:0.82rem;">Use insights and reports to improve hostel management and student satisfaction.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ────────────────────────────────────── -->
+  <section class="section section-center" id="testimonials">
+    <div class="section-tag">Reviews</div>
+    <h2 class="section-title">Loved by <span class="gradient-text">Students & Admins</span></h2>
+    <p class="section-desc">Hear what our users say about their experience with HostelHub.</p>
+    <div class="testimonials-grid">
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"HostelHub completely transformed how we manage our 500-bed hostel. Fee collection alone has saved us 20 hours a month!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#6c63ff,#574fd6);">R</div>
+          <div>
+            <div class="testi-name">Rajesh Kumar</div>
+            <div class="testi-role">Hostel Warden, IIT Delhi</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:0.15s;">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"As a student, I love that I can check my room details, pay fees, and raise complaints all in one place. Super convenient!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#ff6584,#e54d73);">A</div>
+          <div>
+            <div class="testi-name">Ananya Sharma</div>
+            <div class="testi-role">B.Tech Student, NIT Trichy</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:0.3s;">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The analytics dashboard gives me a real-time view of everything. We've drastically reduced pending complaints with HostelHub."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#10b981,#059669);">P</div>
+          <div>
+            <div class="testi-name">Priya Menon</div>
+            <div class="testi-role">Chief Warden, BITS Pilani</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ────────────────────────────────────────────── -->
+  <div class="cta-section" id="contact">
+    <div class="cta-inner">
+      <div class="section-tag" style="margin-bottom:16px;">Get Started Today</div>
+      <h2 class="cta-title">Ready to Transform Your <span class="gradient-text">Hostel Management?</span></h2>
+      <p class="cta-desc">Join thousands of institutions already using HostelHub to simplify their operations.</p>
+      <div class="cta-btns">
+        <a href="register.html" class="btn btn-primary btn-lg">🚀 Create Free Account</a>
+        <a href="login.html" class="btn btn-secondary btn-lg">👀 View Demo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.1rem;">
+          <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:9px;display:flex;align-items:center;justify-content:center;">🏠</div>
+          HostelHub
+        </div>
+        <p>Modern hostel management system for educational institutions. Simplifying student accommodation worldwide.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <div class="footer-links">
+          <a href="#features">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Changelog</a>
+          <a href="#">Documentation</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a href="#">About Us</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Policy</a>
+          <a href="#">Security</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 HostelHub. All rights reserved.</span>
+      <span>Made with ❤️ for students everywhere</span>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

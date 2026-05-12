@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — HostelHub</title>
+  <meta name="description" content="Create your HostelHub account." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    .auth-card { max-width: 560px; }
+    .strength-bar { height: 4px; background: var(--bg-card2); border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
+    .strength-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease, background 0.4s ease; }
+    .strength-text { font-size: 0.72rem; color: var(--text-dim); }
+    .prog-step { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+    .prog-dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--bg-card2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; transition: var(--transition); position: relative; z-index: 1;
+    }
+    .prog-dot.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .prog-dot.done   { background: var(--success);  border-color: var(--success);  color: #fff; }
+    .prog-line { flex: 1; height: 2px; background: var(--border); transition: background 0.4s ease; max-width: 60px; }
+    .prog-line.done { background: var(--success); }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-bg"></div>
+
+    <a href="index.html" style="position:fixed;top:24px;left:24px;display:flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);z-index:10;">
+      ← Back to Home
+    </a>
+
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">🏠</div>
+        HostelHub
+      </div>
+
+      <h1 class="auth-title" style="font-size:1.6rem;">Create Account</h1>
+      <p class="auth-sub">Join HostelHub — it's free to get started</p>
+
+      <!-- Progress -->
+      <div class="prog-step" id="progStep">
+        <div class="prog-dot active" id="dot1">1</div>
+        <div class="prog-line" id="line1"></div>
+        <div class="prog-dot" id="dot2">2</div>
+        <div class="prog-line" id="line2"></div>
+        <div class="prog-dot" id="dot3">3</div>
+      </div>
+
+      <!-- Error -->
+      <div id="errorMsg" style="display:none;background:var(--danger-light);color:var(--danger);border-radius:var(--radius-sm);padding:10px 14px;font-size:0.85rem;border-left:3px solid var(--danger);margin-bottom:16px;"></div>
+
+      <!-- STEP 1 -->
+      <div id="step1">
+        <div class="auth-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="firstName">First Name</label>
+              <input type="text" id="firstName" class="form-control" placeholder="John" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lastName">Last Name</label>
+              <input type="text" id="lastName" class="form-control" placeholder="Doe" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regEmail">Email Address</label>
+            <div class="input-icon-wrap">
+              <span class="icon">✉️</span>
+              <input type="email" id="regEmail" class="form-control" placeholder="john@college.edu" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <div class="input-icon-wrap">
+              <span class="icon">📱</span>
+              <input type="tel" id="phone" class="form-control" placeholder="+91 9876543210" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="role">I am a</label>
+            <select id="role" class="form-control">
+              <option value="student">🎓 Student</option>
+              <option value="admin">🛡️ Admin / Warden</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary btn-block" onclick="validateStep1()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" style="display:none;">
+        <div class="auth-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="form-group">
+            <label class="form-label" for="studentId">Student / Staff ID</label>
+            <div class="input-icon-wrap">
+              <span class="icon">🪪</span>
+              <input type="text" id="studentId" class="form-control" placeholder="e.g. BT22CS045" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hostelName">Institution / Hostel Name</label>
+            <div class="input-icon-wrap">
+              <span class="icon">🏛️</span>
+              <input type="text" id="hostelName" class="form-control" placeholder="e.g. IIT Delhi – Brahmaputra Hostel" required />
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="block">Block</label>
+              <select id="block" class="form-control">
+                <option>Block A</option><option>Block B</option><option>Block C</option><option>Block D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="roomNo">Room Number</label>
+              <input type="text" id="roomNo" class="form-control" placeholder="e.g. 204" />
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button type="button" class="btn btn-secondary btn-block" onclick="goStep(1)">← Back</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="validateStep2()">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" style="display:none;">
+        <div class="auth-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="form-group">
+            <label class="form-label" for="newPassword">Create Password</label>
+            <div class="input-icon-wrap">
+              <span class="icon">🔒</span>
+              <input type="password" id="newPassword" class="form-control" placeholder="Min. 6 characters" oninput="checkStrength(this.value)" required style="padding-right:44px;" />
+              <button type="button" onclick="togglePwd('newPassword')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:1rem;cursor:pointer;background:none;border:none;">👁️</button>
+            </div>
+            <div style="margin-top:6px;">
+              <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%;"></div></div>
+              <div class="strength-text" id="strengthText">Enter a password</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <div class="input-icon-wrap">
+              <span class="icon">🔒</span>
+              <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat password" required style="padding-right:44px;" />
+              <button type="button" onclick="togglePwd('confirmPassword')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:1rem;cursor:pointer;background:none;border:none;">👁️</button>
+            </div>
+          </div>
+          <label class="checkbox-label" style="align-items:flex-start;gap:10px;padding:4px 0;">
+            <input type="checkbox" id="agreeTerms" style="margin-top:2px;" />
+            <span style="font-size:0.82rem;color:var(--text-muted);">I agree to the <a href="#" style="color:var(--primary);">Terms of Service</a> and <a href="#" style="color:var(--primary);">Privacy Policy</a></span>
+          </label>
+          <div style="display:flex;gap:12px;">
+            <button type="button" class="btn btn-secondary btn-block" onclick="goStep(2)">← Back</button>
+            <button type="button" class="btn btn-primary btn-block" id="registerBtn" onclick="doRegister()">Create Account 🎉</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer" style="margin-top:20px;">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="scripts/supabase.js"></script>
+  <script src="scripts/main.js"></script>
+  <script>
+    let currentStep = 1;
+
+    window.goStep = function(n) {
+      document.getElementById('step' + currentStep).style.display = 'none';
+      currentStep = n;
+      document.getElementById('step' + currentStep).style.display = '';
+      updateProgress(n);
+      document.getElementById('errorMsg').style.display = 'none';
+    };
+
+    function updateProgress(step) {
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById('dot' + i);
+        dot.classList.toggle('active', i === step);
+        dot.classList.toggle('done', i < step);
+        if (i < 3) document.getElementById('line' + i).classList.toggle('done', i < step);
+      }
+    }
+
+    window.validateStep1 = function() {
+      const fn = document.getElementById('firstName').value.trim();
+      const em = document.getElementById('regEmail').value.trim();
+      if (!fn) { showE('First name is required.'); return; }
+      if (!em || !/\S+@\S+\.\S+/.test(em)) { showE('Enter a valid email address.'); return; }
+      window.goStep(2);
+    };
+
+    window.validateStep2 = function() {
+      const sid  = document.getElementById('studentId').value.trim();
+      const hos  = document.getElementById('hostelName').value.trim();
+      if (!sid) { showE('Student / Staff ID is required.'); return; }
+      if (!hos) { showE('Institution name is required.'); return; }
+      window.goStep(3);
+    };
+
+    window.doRegister = async function() {
+      const pwd   = document.getElementById('newPassword').value;
+      const cpwd  = document.getElementById('confirmPassword').value;
+      const agree = document.getElementById('agreeTerms').checked;
+      if (pwd.length < 6)  { showE('Password must be at least 6 characters.'); return; }
+      if (pwd !== cpwd)    { showE('Passwords do not match.'); return; }
+      if (!agree)          { showE('Please accept the Terms of Service.'); return; }
+
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true; btn.textContent = '⏳ Creating account...';
+
+      const fullName  = (document.getElementById('firstName').value.trim() + ' ' + document.getElementById('lastName').value.trim());
+      const email     = document.getElementById('regEmail').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const role      = document.getElementById('role').value;
+      const studentId = document.getElementById('studentId').value.trim();
+      const hostel    = document.getElementById('hostelName').value.trim();
+      const block     = document.getElementById('block').value;
+      const roomNo    = document.getElementById('roomNo').value.trim();
+
+      // Sign up with Supabase Auth
+      const { data, error } = await _sb.auth.signUp({
+        email,
+        password: pwd,
+        options: {
+          data: { full_name: fullName, role }
+        }
+      });
+
+      if (error) {
+        showE(error.message);
+        btn.disabled = false; btn.textContent = 'Create Account 🎉'; return;
+      }
+
+        if (data.user) {
+        // Insert profile row
+        const { error: pErr } = await _sb.from('profiles').insert({
+          id:          data.user.id,
+          full_name:   fullName,
+          email,
+          phone:       phone || null,
+          role,
+          student_id:  studentId,
+          hostel_name: hostel,
+          block,
+          room_no:     roomNo || null,
+        });
+
+        if (pErr) {
+          // profile insert failed — sign out and show error
+          await _sb.auth.signOut();
+          showE('Account created but profile setup failed: ' + pErr.message);
+          btn.disabled = false; btn.textContent = 'Create Account 🎉'; return;
+        }
+      }
+
+      showToast('🎉 Account created! Check your email for a confirmation link, then log in.', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 2500);
+    };
+
+    window.togglePwd = function(id) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    };
+
+    window.checkStrength = function(val) {
+      const fill = document.getElementById('strengthFill');
+      const txt  = document.getElementById('strengthText');
+      let score = 0;
+      if (val.length >= 6)  score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['', '#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
+      const widths = ['0%', '25%', '50%', '75%', '100%'];
+      fill.style.width = val ? widths[Math.min(score,4)] : '0%';
+      fill.style.background = colors[Math.min(score,4)];
+      txt.textContent = val ? labels[Math.min(score,4)] : 'Enter a password';
+      txt.style.color = colors[Math.min(score,4)] || 'var(--text-dim)';
+    };
+
+    function showE(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg; el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
